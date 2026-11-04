@@ -176,6 +176,46 @@ escribe `ipconfig` y busca la "Dirección IPv4" (por ejemplo `192.168.1.15`). En
   al arrancar y todas las sesiones se cierran cada vez que reinicias el servidor.
 - Crea un usuario de MySQL con contraseña para la aplicación en lugar de `root` sin contraseña.
 
+## Publicarlo en internet (Render + Aiven)
+
+El sistema ya está preparado para correr en internet:
+
+- Las sesiones se guardan en la tabla `sesiones` de MySQL (no en la memoria del servidor).
+- Las imágenes de las preguntas se guardan en la tabla `imagenes` cuando `NODE_ENV=production`,
+  porque Render borra sus archivos al reiniciar. En tu computadora siguen en `public/uploads/preguntas/`.
+- Ambas tablas se crean solas la primera vez.
+
+**1. Base de datos en Aiven.** Crea un servicio MySQL gratis, descarga el certificado como `ca.pem`
+en la carpeta del proyecto y crea el archivo `.env.nube`:
+
+```
+DB_HOST=mysql-xxxxx.aivencloud.com
+DB_PORT=12345
+DB_USER=avnadmin
+DB_PASSWORD=tu-contraseña-de-aiven
+DB_NAME=defaultdb
+DB_CA_FILE=ca.pem
+```
+
+Luego crea las tablas (solo la primera vez, porque borra lo que haya):
+
+```
+node --env-file=.env.nube scripts/importar-sql.js database/proyecto_final.sql
+```
+
+**2. Servidor en Render.** New, Web Service, tu repositorio de GitHub. Build: `npm install`.
+Start: `npm start`. En Secret Files agrega `ca.pem`. En Environment agrega:
+
+```
+NODE_ENV=production
+TZ=America/Tegucigalpa
+SESSION_SECRET=una-frase-larga-inventada
+DB_HOST=...  DB_PORT=...  DB_USER=avnadmin  DB_PASSWORD=...  DB_NAME=defaultdb
+DB_CA_FILE=/etc/secrets/ca.pem
+```
+
+`.env`, `.env.nube` y `ca.pem` están en `.gitignore`: nunca se suben a GitHub.
+
 ## Créditos de terceros
 
 - Íconos: Material Design Icons de Google (licencia Apache 2.0).

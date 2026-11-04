@@ -1,2 +1,13 @@
 node_modules/
 *.log
+
+# Contraseñas y certificados: nunca se suben a GitHub
+.env
+.env.*
+ca.pem
+
+# Imágenes subidas en tu computadora
+public/uploads/
+
+# Programas locales
+cloudflared.exe
