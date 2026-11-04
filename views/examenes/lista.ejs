@@ -1,0 +1,54 @@
+<%- include('../partials/inicioApp', { titulo: titulo }) %>
+<%
+  function enlace(est) { var p = []; if (est) p.push('estado=' + est); if (temaId) p.push('tema=' + temaId); return '/docente/examenes' + (p.length ? '?' + p.join('&') : ''); }
+  var nombres = { publicado: 'Publicado', borrador: 'Borrador', archivado: 'Archivado' };
+  var clases = { publicado: 'verde', borrador: 'naranja', archivado: 'gris' };
+%>
+<div class="cabecera-seccion">
+  <p><%= conteo[''] %> <%= conteo[''] === 1 ? 'test' : 'tests' %><%= temaId ? '' : ' en todos tus temas' %></p>
+  <% if (temas.length) { %>
+    <a class="boton" href="/docente/examenes/nuevo<%= temaId ? '?tema=' + temaId : '' %>"><%- icono('MdAdd') %> Nuevo test</a>
+  <% } %>
+</div>
+<% if (!temas.length) { %>
+  <div class="mensaje info"><%- icono('MdInfo') %><span>Primero crea un tema en el menú Temas. Cada test pertenece a un tema.</span></div>
+<% } else { %>
+  <form class="filtros filtros-examenes" method="get" action="/docente/examenes">
+    <% if (estado) { %><input type="hidden" name="estado" value="<%= estado %>"><% } %>
+    <div class="campo">
+      <label for="tema" class="oculto-visual">Tema</label>
+      <select id="tema" name="tema">
+        <option value="">Tema: todos</option>
+        <% temas.forEach(function (t) { %><option value="<%= t.id %>" <%= temaId === t.id ? 'selected' : '' %>><%= t.nombre %></option><% }) %>
+      </select>
+    </div>
+  </form>
+  <nav class="pestanas" aria-label="Estado">
+    <a href="<%= enlace('') %>" class="<%= !estado ? 'activa' : '' %>">Todos (<%= conteo[''] %>)</a>
+    <a href="<%= enlace('publicado') %>" class="<%= estado === 'publicado' ? 'activa' : '' %>">Publicados (<%= conteo.publicado %>)</a>
+    <a href="<%= enlace('borrador') %>" class="<%= estado === 'borrador' ? 'activa' : '' %>">Borradores (<%= conteo.borrador %>)</a>
+    <a href="<%= enlace('archivado') %>" class="<%= estado === 'archivado' ? 'activa' : '' %>">Archivados (<%= conteo.archivado %>)</a>
+  </nav>
+  <div class="tabla-contenedor">
+    <table class="tabla-responsiva">
+      <thead><tr><th>Test</th><th>Tema</th><th>Preguntas</th><th>Duración</th><th>Intentos</th><th>Cierra</th><th>Estado</th><th>Acción</th></tr></thead>
+      <tbody>
+        <% if (!tests.length) { %><tr><td colspan="8" class="vacio">No hay tests <%= estado ? 'en este estado' : 'todavía' %>.</td></tr><% } %>
+        <% tests.forEach(function (t) { %>
+          <tr>
+            <td data-label="Test"><strong><%= t.nombre %></strong><% if (t.intentos_realizados) { %><br><small style="color:var(--gris-texto)"><%= t.intentos_realizados %> <%= t.intentos_realizados === 1 ? 'intento realizado' : 'intentos realizados' %></small><% } %></td>
+            <td data-label="Tema"><span class="punto" style="background:<%= t.tema_color %>"></span><%= t.tema %></td>
+            <td data-label="Preguntas"><%= t.preguntas %></td>
+            <td data-label="Duración"><%= t.duracion_min %> min</td>
+            <td data-label="Intentos"><%= t.intentos_max %></td>
+            <td data-label="Cierra"><%= fecha(t.fecha_cierre) %></td>
+            <td data-label="Estado"><span class="etiqueta <%= clases[t.estado] %>"><%= nombres[t.estado] %></span></td>
+            <td data-label="Acción"><a class="enlace-boton" href="/docente/examenes/<%= t.id %>"><%= t.estado === 'archivado' ? 'Ver' : 'Editar' %></a></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <p class="ayuda" style="font-size:13px; color:var(--gris-texto); margin-top:12px">Un test con intentos de estudiantes no se borra: pasa a Archivado para conservar las notas.</p>
+<% } %>
+<%- include('../partials/finApp') %>

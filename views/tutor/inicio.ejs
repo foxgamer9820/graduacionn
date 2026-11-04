@@ -1,0 +1,26 @@
+<%- include('../partials/inicioApp', { titulo: titulo }) %>
+<% if (!estudiantes.length) { %>
+  <div class="tarjeta vacio">Todavía no tienes estudiantes vinculados. Habla con el docente.</div>
+<% } else { %>
+  <div class="cabecera-seccion" style="align-items:flex-start">
+    <nav class="selector-estudiante" aria-label="Elegir estudiante">
+      <% estudiantes.forEach(function (e) { %>
+        <a href="/tutor?e=<%= e.dni %>" class="boton chico <%= elegido.dni === e.dni ? '' : 'secundario' %>" <%= elegido.dni === e.dni ? 'aria-current=page' : '' %>><%= e.nombres %> <%= primerNombre(e.apellidos) %></a>
+      <% }) %>
+    </nav>
+    <div class="mensaje info" style="margin:0"><%- icono('MdInfo') %><span>Solo consulta. La cuenta la administra el docente.</span></div>
+  </div>
+  <p class="texto-gris">Parentesco: <%= elegido.parentesco %> · Último ingreso de <%= elegido.nombres %>: <%= fecha(elegido.ultimo_acceso, true) %></p>
+  <%- include('../rendimiento/_resumen', { resumen: resumen, grafica: grafica, intentos: intentos, enlaceIntento: '/tutor/resultados/', vacio: elegido.nombres + ' todavía no ha terminado ningún test.' }) %>
+  <section class="tarjeta" style="margin-top:16px">
+    <h2>Tests pendientes</h2>
+    <% if (!pendientes.length) { %><p class="vacio" style="padding:12px">No tiene tests pendientes por ahora.</p><% } %>
+    <ul class="lista-simple">
+      <% pendientes.forEach(function (t) { %>
+        <li><div><strong><%= t.nombre %></strong><small><%= t.tema %> · Intentos: <%= t.usados %> de <%= t.intentos_max %></small></div>
+          <span class="etiqueta naranja"><%= t.fecha_cierre ? 'Cierra el ' + fecha(t.fecha_cierre) : 'Sin fecha de cierre' %></span></li>
+      <% }) %>
+    </ul>
+  </section>
+<% } %>
+<%- include('../partials/finApp') %>

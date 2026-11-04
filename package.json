@@ -1,0 +1,26 @@
+{
+  "name": "software-educativo-tests",
+  "version": "1.0.0",
+  "description": "Software educativo de ejercitación tutorial con tests de selección única. Proyecto de Graduación IEREQ01, UPNFM CURNAC.",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node --watch app.js"
+  },
+  "author": "Angel Luis Quiñonez Rivera",
+  "license": "UNLICENSED",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "body-parser": "^2.2.0",
+    "compression": "^1.8.2",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1",
+    "multer": "^2.5.0",
+    "mysql2": "^3.14.0"
+  }
+}

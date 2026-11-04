@@ -1,0 +1,49 @@
+<%# Resumen de rendimiento de un estudiante: lo usan Mi progreso, el docente y el padre %>
+<div class="estadisticas">
+  <div class="tarjeta estadistica"><span class="circulo azul"><%- icono('MdTrendingUp') %></span><div><strong><%= resumen.promedio === null ? '—' : resumen.promedio %></strong><span>Promedio general</span></div></div>
+  <div class="tarjeta estadistica"><span class="circulo verde"><%- icono('MdAssignment') %></span><div><strong><%= resumen.completados %></strong><span>Tests completados</span></div></div>
+  <div class="tarjeta estadistica"><span class="circulo morado"><%- icono('MdCheckCircle') %></span><div><strong><%= resumen.aprobados %></strong><span>Tests aprobados</span></div></div>
+  <div class="tarjeta estadistica"><span class="circulo naranja"><%- icono('MdEmojiEvents') %></span><div><strong><%= resumen.mejor === null ? '—' : nota(resumen.mejor) %></strong><span>Mejor nota</span></div></div>
+</div>
+<% if (!intentos.length) { %>
+  <div class="tarjeta vacio"><%= vacio %></div>
+<% } else { %>
+  <div class="dos-columnas">
+    <section class="tarjeta">
+      <h2>Calificaciones en el tiempo</h2>
+      <%- grafica %>
+      <p class="leyenda"><span class="punto" style="background:var(--verde)"></span>Aprobado <span class="punto" style="background:var(--rojo); margin-left:14px"></span>Reprobado</p>
+    </section>
+    <section class="tarjeta">
+      <h2>Por tema</h2>
+      <% resumen.porTema.forEach(function (t) { %>
+        <div class="tema-progreso">
+          <div><strong><%= t.nombre %></strong><span class="nota <%= t.promedio >= 70 ? 'verde' : 'rojo' %>"><%= t.promedio %></span></div>
+          <div class="barra"><span style="width:<%= t.promedio %>%; background:<%= t.color %>"></span></div>
+          <small><%= t.aprobados %> de <%= t.tests %> tests aprobados</small>
+        </div>
+      <% }) %>
+    </section>
+  </div>
+  <section class="tarjeta" style="margin-top:16px">
+    <h2>Historial</h2>
+    <div class="tabla-contenedor">
+      <table class="tabla-responsiva">
+        <thead><tr><th>Fecha</th><th>Test</th><th>Tema</th><th>Intento</th><th>Nota</th><th>Estado</th><th></th></tr></thead>
+        <tbody>
+          <% intentos.forEach(function (r) { %>
+            <tr>
+              <td data-label="Fecha"><%= fecha(r.fecha_fin, true) %></td>
+              <td data-label="Test"><strong><%= r.test %></strong></td>
+              <td data-label="Tema"><%= r.tema %></td>
+              <td data-label="Intento"><%= r.intento %></td>
+              <td data-label="Nota"><span class="nota <%= r.aprobado ? 'verde' : 'rojo' %>"><%= nota(r.calificacion) %></span></td>
+              <td data-label="Estado"><span class="etiqueta <%= r.aprobado ? 'verde' : 'rojo' %>"><%= r.aprobado ? 'Aprobado' : 'Reprobado' %></span></td>
+              <td data-label=""><a class="enlace-boton" href="<%= enlaceIntento + r.id %>">Ver</a></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+<% } %>

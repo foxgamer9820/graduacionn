@@ -1,0 +1,12 @@
+<%- include('partials/head', { titulo: titulo }) %>
+<body>
+<main class="centrado">
+  <div class="tarjeta acceso-tarjeta" style="text-align:center">
+    <div class="icono-grande naranja"><%- icono('MdWarning') %></div>
+    <h2><%= titulo %></h2>
+    <p class="sub"><%= mensaje %></p>
+    <a class="boton" href="/"><%- icono('MdArrowBack') %> Volver al inicio</a>
+  </div>
+</main>
+</body>
+</html>

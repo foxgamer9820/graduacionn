@@ -1,0 +1,6 @@
+<% if (flash) { %>
+  <div class="mensaje <%= flash.tipo %>" role="status">
+    <%- icono(flash.tipo === 'exito' ? 'MdCheckCircle' : flash.tipo === 'aviso' ? 'MdWarning' : 'MdInfo') %>
+    <span><%= flash.texto %></span>
+  </div>
+<% } %>

@@ -1,0 +1,29 @@
+<%# Campos de configuración del test (se usan al crear y al editar) %>
+<div class="campo">
+  <label for="nombre">Nombre del test</label>
+  <input id="nombre" name="nombre" value="<%= datos.nombre %>" maxlength="100" placeholder="Por ejemplo: Algoritmos básicos" required>
+</div>
+<div class="campo">
+  <label for="descripcion">Descripción o instrucciones (opcional)</label>
+  <textarea id="descripcion" name="descripcion" maxlength="500" rows="2" placeholder="Lo que verá el estudiante antes de comenzar"><%= datos.descripcion %></textarea>
+</div>
+<div class="campo">
+  <label for="tema_id">Tema</label>
+  <select id="tema_id" name="tema_id" required>
+    <% temas.forEach(function (t) { %><option value="<%= t.id %>" <%= Number(datos.tema_id) === t.id ? 'selected' : '' %>><%= t.nombre %><%= t.estado === 'inactivo' ? ' (inactivo)' : '' %></option><% }) %>
+  </select>
+</div>
+<div class="fila-3">
+  <div class="campo"><label for="duracion_min">Duración (min)</label><input type="number" id="duracion_min" name="duracion_min" value="<%= datos.duracion_min %>" min="1" max="600" required></div>
+  <div class="campo"><label for="intentos_max">Intentos</label><input type="number" id="intentos_max" name="intentos_max" value="<%= datos.intentos_max %>" min="1" max="20" required></div>
+  <div class="campo"><label for="puntaje_aprobacion">Nota mínima (%)</label><input type="number" id="puntaje_aprobacion" name="puntaje_aprobacion" value="<%= datos.puntaje_aprobacion %>" min="0" max="100" required></div>
+</div>
+<div class="fila">
+  <div class="campo"><label for="fecha_apertura">Abre (opcional)</label><input type="datetime-local" id="fecha_apertura" name="fecha_apertura" value="<%= datos.fecha_apertura %>"></div>
+  <div class="campo"><label for="fecha_cierre">Cierra (opcional)</label><input type="datetime-local" id="fecha_cierre" name="fecha_cierre" value="<%= datos.fecha_cierre %>"></div>
+</div>
+<label class="interruptor">
+  <input type="checkbox" name="mostrar_respuestas" value="1" <%= Number(datos.mostrar_respuestas) ? 'checked' : '' %>>
+  <span class="pista" aria-hidden="true"></span>
+  <span>Mostrar respuestas correctas y retroalimentación al terminar</span>
+</label>

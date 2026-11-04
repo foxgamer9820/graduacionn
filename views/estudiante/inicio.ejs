@@ -1,0 +1,57 @@
+<%- include('../partials/inicioApp', { titulo: 'Inicio' }) %>
+<h2 class="saludo">Hola, <%= primerNombre(usuario.nombres) %></h2>
+<p style="color:var(--gris-texto); margin:0 0 18px"><%= pendientes ? 'Tienes ' + pendientes + (pendientes === 1 ? ' test pendiente' : ' tests pendientes') : 'No tienes tests pendientes por ahora' %></p>
+
+<div class="inicio-estudiante">
+  <div>
+    <h2 class="subtitulo">Mis temas</h2>
+    <% if (!temas.length) { %><div class="mensaje info"><%- icono('MdInfo') %><span>Todavía no estás inscrito en ningún tema. Tu docente te inscribirá.</span></div><% } %>
+    <% temas.forEach(function (t) { %>
+      <div class="tarjeta tema-mini">
+        <div class="tema-tarjeta"><span class="circulo" style="background:<%= t.color %>"><%- icono('MdMenuBook') %></span>
+          <div><strong><%= t.nombre %></strong><br><small style="color:var(--gris-texto)"><%= t.aprobados %> de <%= t.tests %> tests aprobados</small></div></div>
+        <div class="barra" style="margin-top:12px"><span style="width:<%= t.tests ? Math.round(t.aprobados / t.tests * 100) : 0 %>%; background:<%= t.color %>"></span></div>
+      </div>
+    <% }) %>
+    <div class="tarjeta tema-mini">
+      <small style="color:var(--gris-texto)">Mi promedio general</small>
+      <div style="display:flex; align-items:baseline; gap:12px"><strong class="promedio"><%= promedio === null ? '—' : promedio %></strong><a class="enlace-boton" href="/estudiante/progreso">Ver mi progreso ›</a></div>
+    </div>
+  </div>
+
+  <div>
+    <h2 class="subtitulo">Tests disponibles</h2>
+    <% if (!tests.length) { %><p class="vacio tarjeta">Cuando tu docente publique un test, aparecerá aquí.</p><% } %>
+    <% tests.forEach(function (t) {
+         var quedan = t.intentos_max - t.intentos;
+         var boton = t.en_curso ? ['Continuar', 'primario'] : quedan > 0 ? [t.intentos ? 'Reintentar' : 'Comenzar', t.intentos ? 'secundario' : 'primario'] : ['Ver resultado', 'secundario']; %>
+      <article class="tarjeta test-disponible">
+        <div class="test-info">
+          <div class="test-titulo">
+            <strong><%= t.nombre %></strong>
+            <% if (t.en_curso) { %><span class="etiqueta naranja">En curso</span>
+            <% } else if (t.mejor_nota !== null) { %><span class="etiqueta <%= t.aprobado ? 'verde' : 'rojo' %>"><%= t.aprobado ? 'Aprobado' : 'Reprobado' %></span><% } %>
+          </div>
+          <small><span class="punto" style="background:<%= t.tema_color %>"></span><%= t.tema %> · <%= t.preguntas %> <%= t.preguntas === 1 ? 'pregunta' : 'preguntas' %> · <%= t.duracion_min %> min</small>
+          <small>
+            <%= t.mejor_nota !== null ? 'Mejor nota: ' + nota(t.mejor_nota) + ' · ' : '' %>Intentos: <%= t.intentos %> de <%= t.intentos_max %><%= t.fecha_cierre ? ' · Cierra el ' + fecha(t.fecha_cierre) : '' %>
+          </small>
+        </div>
+        <a class="boton chico <%= boton[1] === 'secundario' ? 'secundario' : '' %>" href="<%= t.en_curso ? '/estudiante/intentos/' + t.en_curso + '/1' : '/estudiante/tests/' + t.id %>"><%= boton[0] %></a>
+      </article>
+    <% }) %>
+
+    <% if (recientes.length) { %>
+      <h2 class="subtitulo" style="margin-top:22px">Resultados recientes</h2>
+      <section class="tarjeta">
+        <ul class="lista-simple">
+          <% recientes.forEach(function (r) { %>
+            <li><div><a href="/estudiante/resultados/<%= r.id %>"><strong><%= r.test %></strong></a><small><%= r.tema %> · Intento <%= r.intento %> · <%= fecha(r.fecha_fin) %></small></div>
+              <span class="nota <%= r.aprobado ? 'verde' : 'rojo' %>"><%= nota(r.calificacion) %></span></li>
+          <% }) %>
+        </ul>
+      </section>
+    <% } %>
+  </div>
+</div>
+<%- include('../partials/finApp') %>

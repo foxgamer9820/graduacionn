@@ -1,0 +1,19 @@
+<%- include('partials/head', { titulo: 'Contraseña temporal' }) %>
+<body>
+<main class="centrado">
+  <div class="tarjeta acceso-tarjeta">
+    <div class="icono-grande verde"><%- icono('MdCheckCircle') %></div>
+    <h2 style="text-align:center"><%= datos.motivo === 'creada' ? 'Cuenta creada' : 'Contraseña restablecida' %></h2>
+    <p class="sub" style="text-align:center">Entrega estos datos a <strong><%= datos.nombre %></strong> (<%= datos.tipo %>)</p>
+    <div class="grupo-titulo">Usuario (DNI)</div>
+    <div class="dato-fijo"><%= datos.dni %></div>
+    <div class="grupo-titulo">Contraseña temporal</div>
+    <div class="clave-temporal"><%= datos.clave %></div>
+    <p style="color:var(--rojo); font-size:13px; text-align:center; margin:0 0 18px">Vence en <%= horas %> horas. Esta contraseña no se volverá a mostrar.</p>
+    <div class="fila">
+      <button class="boton secundario imprimir" type="button"><%- icono('MdPrint') %> Imprimir</button>
+      <a class="boton" href="<%= datos.volver %>">Listo</a>
+    </div>
+  </div>
+</main>
+<%- include('partials/fin') %>

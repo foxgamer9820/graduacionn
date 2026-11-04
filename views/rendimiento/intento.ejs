@@ -1,0 +1,28 @@
+<%- include('../partials/inicioApp', { titulo: titulo, seccion: volver.indexOf('/tutor') === 0 ? '/tutor' : '/docente/rendimiento' }) %>
+<% var aprobado = intento.aprobado === 1; %>
+<a class="enlace-boton" href="<%= volver %>" style="display:inline-flex; gap:4px; align-items:center; margin-bottom:12px"><%- icono('MdArrowBack') %> <%= textoVolver %></a>
+<div class="resultado">
+  <section class="tarjeta resultado-nota">
+    <div class="anillo <%= aprobado ? 'verde' : 'rojo' %>" style="--porcentaje: <%= Number(intento.calificacion) %>" role="img" aria-label="Calificación: <%= nota(intento.calificacion) %> de 100">
+      <div><strong><%= nota(intento.calificacion) %></strong><small>de 100</small></div>
+    </div>
+    <span class="etiqueta <%= aprobado ? 'verde' : 'rojo' %>" style="font-size:14px"><%= aprobado ? 'Aprobado' : 'Reprobado' %></span>
+    <dl class="datos-resultado">
+      <dt>Estudiante</dt><dd><%= intento.nombres %> <%= intento.apellidos %></dd>
+      <dt>Test</dt><dd><%= intento.test %></dd>
+      <dt>Correctas</dt><dd><%= intento.correctas %> de <%= intento.total_preguntas %></dd>
+      <dt>Tiempo</dt><dd><%= duracionTexto(intento.tiempo_segundos) %></dd>
+      <dt>Intento</dt><dd><%= intento.intento %> de <%= intento.intentos_max %></dd>
+      <dt>Fecha</dt><dd><%= fecha(intento.fecha_fin, true) %></dd>
+    </dl>
+  </section>
+  <section class="tarjeta">
+    <h2>Respuestas</h2>
+    <% if (!mostrar) { %>
+      <div class="mensaje info"><%- icono('MdInfo') %><span>El docente decidió no mostrar las respuestas de este test.</span></div>
+    <% } else { %>
+      <%- include('../partials/revision', { revision: revision }) %>
+    <% } %>
+  </section>
+</div>
+<%- include('../partials/finApp') %>

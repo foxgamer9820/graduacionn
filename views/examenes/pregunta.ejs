@@ -1,0 +1,72 @@
+<%- include('../partials/inicioApp', { titulo: titulo }) %>
+<%
+  var nueva = modo === 'nueva';
+  var base = '/docente/examenes/' + test.id;
+  var accion = nueva ? base + '/preguntas' : base + '/preguntas/' + pregunta.id;
+%>
+<div class="formulario-cuenta">
+  <a class="enlace-boton" href="<%= base %>" style="display:inline-flex; gap:4px; align-items:center; margin-bottom:12px"><%- icono('MdArrowBack') %> Volver a <%= test.nombre %></a>
+  <section class="tarjeta">
+    <h2><%= nueva ? 'Nueva pregunta (' + (test.total_preguntas + 1) + ')' : 'Editar pregunta' %></h2>
+    <%- include('../partials/mensajes') %>
+    <form id="form-pregunta" method="post" action="<%= accion %>" enctype="multipart/form-data">
+      <div class="fila-enunciado">
+        <div class="campo">
+          <label for="pregunta">Enunciado</label>
+          <textarea id="pregunta" name="pregunta" maxlength="2000" rows="3" placeholder="Por ejemplo: ¿Qué es un algoritmo?" required><%= datos.pregunta %></textarea>
+        </div>
+        <div class="campo">
+          <label for="puntos">Puntos</label>
+          <input type="number" id="puntos" name="puntos" value="<%= datos.puntos %>" min="1" max="100" required>
+        </div>
+      </div>
+
+      <fieldset class="opciones">
+        <legend class="grupo-titulo">Opciones: marca la respuesta correcta</legend>
+        <% [1, 2, 3, 4].forEach(function (n) { var marcada = Number(datos.respuesta_correcta) === n; %>
+          <div class="opcion <%= marcada ? 'es-correcta' : '' %>">
+            <input type="radio" id="correcta<%= n %>" name="respuesta_correcta" value="<%= n %>" <%= marcada ? 'checked' : '' %> required>
+            <label for="correcta<%= n %>" class="letra"><%= 'abcd'[n - 1] %><span class="oculto-visual">: marcar como correcta</span></label>
+            <label for="opcion<%= n %>" class="oculto-visual">Opción <%= 'abcd'[n - 1] %></label>
+            <input id="opcion<%= n %>" name="opcion<%= n %>" value="<%= datos['opcion' + n] %>" maxlength="255" placeholder="Opción <%= 'abcd'[n - 1] %>" required>
+            <span class="marca-correcta">Correcta</span>
+          </div>
+        <% }) %>
+      </fieldset>
+
+      <div class="campo">
+        <label for="retroalimentacion">Retroalimentación (opcional)</label>
+        <textarea id="retroalimentacion" name="retroalimentacion" maxlength="2000" rows="2" placeholder="Explicación que verá el estudiante al revisar su respuesta"><%= datos.retroalimentacion %></textarea>
+      </div>
+
+      <fieldset class="imagen-pregunta">
+        <legend class="grupo-titulo">Imagen (opcional)</legend>
+        <% if (datos.imagen) { %>
+          <div class="imagen-actual">
+            <img src="<%= datos.imagen %>" alt="<%= datos.imagen_alt %>">
+            <label class="casilla"><input type="checkbox" name="quitar_imagen" value="1"> Quitar esta imagen</label>
+          </div>
+        <% } %>
+        <div class="fila">
+          <div class="campo">
+            <label for="imagen"><%= datos.imagen ? 'Reemplazar imagen' : 'Archivo' %></label>
+            <input type="file" id="imagen" name="imagen" accept="image/png,image/jpeg,image/webp,image/gif">
+            <div class="ayuda">PNG, JPG, WEBP o GIF, hasta 2 MB.</div>
+          </div>
+          <div class="campo">
+            <label for="imagen_alt">Descripción de la imagen</label>
+            <input id="imagen_alt" name="imagen_alt" value="<%= datos.imagen_alt %>" maxlength="255" placeholder="Qué muestra la imagen">
+            <div class="ayuda">Obligatoria si hay imagen: la leen los lectores de pantalla.</div>
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="botones">
+        <a class="boton secundario" href="<%= base %>">Cancelar</a>
+        <% if (nueva) { %><button class="boton secundario" type="submit" name="siguiente" value="otra">Guardar y agregar otra</button><% } %>
+        <button class="boton" type="submit" name="siguiente" value="volver"><%= nueva ? 'Guardar pregunta' : 'Guardar cambios' %></button>
+      </div>
+    </form>
+  </section>
+</div>
+<%- include('../partials/finApp') %>

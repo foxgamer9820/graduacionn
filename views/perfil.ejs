@@ -1,0 +1,41 @@
+<%- include('partials/inicioApp', { titulo: 'Mi perfil' }) %>
+<div class="perfil">
+  <section class="tarjeta perfil-resumen">
+    <div class="avatar grande"><%= iniciales(perfil.nombres, perfil.apellidos) %></div>
+    <h2 style="margin-bottom:2px"><%= perfil.nombres %> <%= perfil.apellidos %></h2>
+    <div style="color:var(--gris-texto); font-size:13px"><%= NOMBRE_ROL[perfil.rol] %></div>
+    <dl>
+      <dt>DNI</dt><dd><%= perfil.dni %></dd>
+      <dt>Registro</dt><dd><%= fecha(perfil.fecha_registro) %></dd>
+      <dt>Último ingreso</dt><dd><%= fecha(perfil.ultimo_acceso, true) %></dd>
+    </dl>
+  </section>
+  <section class="tarjeta">
+    <h2>Datos personales</h2>
+    <% if (erroresDatos.length) { %><div class="mensaje error" role="alert"><%- icono('MdCancel') %><ul><% erroresDatos.forEach(function (e) { %><li><%= e %></li><% }) %></ul></div><% } %>
+    <form method="post" action="/perfil">
+      <div class="fila">
+        <div class="campo"><label for="nombres">Nombres</label><input id="nombres" value="<%= perfil.nombres %>" readonly></div>
+        <div class="campo"><label for="apellidos">Apellidos</label><input id="apellidos" value="<%= perfil.apellidos %>" readonly></div>
+        <div class="campo"><label for="dni">DNI</label><input id="dni" value="<%= perfil.dni %>" readonly></div>
+        <div class="campo"><label for="telefono">Teléfono</label><input id="telefono" name="telefono" value="<%= perfil.telefono || '' %>" inputmode="tel" maxlength="15" placeholder="9876-5432"></div>
+      </div>
+      <div class="campo"><label for="email">Correo electrónico</label><input type="email" id="email" name="email" value="<%= perfil.email || '' %>" maxlength="100" placeholder="correo@ejemplo.com"></div>
+      <p class="ayuda" style="font-size:13px; color:var(--gris-texto); display:flex; gap:6px; align-items:center; margin:-4px 0 12px"><%- icono('MdLock') %> Nombre y DNI solo los cambia el docente o el administrador.</p>
+      <div class="botones"><button class="boton" type="submit">Guardar datos</button></div>
+    </form>
+    <hr class="separador">
+    <h2>Cambiar contraseña</h2>
+    <% if (erroresClave.length) { %><div class="mensaje error" role="alert"><%- icono('MdCancel') %><ul><% erroresClave.forEach(function (e) { %><li><%= e %></li><% }) %></ul></div><% } %>
+    <form method="post" action="/perfil/clave">
+      <div class="fila-3">
+        <%- include('partials/campoClave', { id: 'actual', etiqueta: 'Actual' }) %>
+        <%- include('partials/campoClave', { id: 'nueva', etiqueta: 'Nueva', auto: 'new-password' }) %>
+        <%- include('partials/campoClave', { id: 'confirmar', etiqueta: 'Confirmar', auto: 'new-password' }) %>
+      </div>
+      <p class="ayuda" style="font-size:13px; color:var(--gris-texto); margin:-4px 0 12px">Mínimo 8 caracteres, con al menos una letra y un número.</p>
+      <div class="botones"><button class="boton" type="submit">Cambiar contraseña</button></div>
+    </form>
+  </section>
+</div>
+<%- include('partials/finApp') %>

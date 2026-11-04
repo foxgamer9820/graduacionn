@@ -1,0 +1,16 @@
+<form class="filtros filtros-rendimiento" method="get" action="/docente/rendimiento">
+  <div class="campo">
+    <label for="tema">Tema</label>
+    <select id="tema" name="tema">
+      <option value="">Todos mis temas</option>
+      <% temas.forEach(function (t) { %><option value="<%= t.id %>" <%= temaId === t.id ? 'selected' : '' %>><%= t.nombre %></option><% }) %>
+    </select>
+  </div>
+  <div class="campo">
+    <label for="test">Test</label>
+    <select id="test" name="test">
+      <option value="">Resumen de todos los tests</option>
+      <% tests.forEach(function (t) { %><option value="<%= t.id %>" <%= typeof test !== 'undefined' && test && test.id === t.id ? 'selected' : '' %>><%= t.nombre %><%= temaId ? '' : ' (' + t.tema + ')' %></option><% }) %>
+    </select>
+  </div>
+</form>

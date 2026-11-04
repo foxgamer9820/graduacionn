@@ -1,0 +1,15 @@
+    <ol class="revision">
+      <% revision.forEach(function (r) { var bien = r.es_correcta === 1; var sinResp = r.opcion_elegida === null; %>
+        <li class="<%= bien ? 'bien' : 'mal' %>">
+          <div class="revision-encabezado">
+            <span class="icono-resultado"><%- icono(bien ? 'MdCheckCircle' : 'MdCancel') %><span class="oculto-visual"><%= bien ? 'Correcta' : 'Incorrecta' %></span></span>
+            <p class="revision-pregunta"><%= r.posicion %>. <%= r.pregunta %></p>
+            <span class="etiqueta <%= bien ? 'verde' : 'gris' %>"><%= bien ? r.puntos : 0 %>/<%= r.puntos %></span>
+          </div>
+          <% if (r.imagen) { %><img class="pregunta-imagen chica" src="<%= r.imagen %>" alt="<%= r.imagen_alt %>"><% } %>
+          <p class="tu-respuesta <%= bien ? 'verde' : 'rojo' %>">Tu respuesta: <%= sinResp ? 'sin responder' : 'abcd'[r.opcion_elegida - 1] + ') ' + r['opcion' + r.opcion_elegida] %></p>
+          <% if (!bien) { %><p class="respuesta-correcta">Respuesta correcta: <%= 'abcd'[r.respuesta_correcta - 1] %>) <%= r['opcion' + r.respuesta_correcta] %></p><% } %>
+          <% if (r.retroalimentacion) { %><p class="retroalimentacion"><%- icono('MdLightbulb') %> <span><%= r.retroalimentacion %></span></p><% } %>
+        </li>
+      <% }) %>
+    </ol>

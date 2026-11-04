@@ -1,0 +1,47 @@
+<%- include('../partials/inicioApp', { titulo: titulo }) %>
+<%- include('_filtros') %>
+<section class="tarjeta" style="margin-bottom:16px">
+  <h2>Tests publicados y archivados</h2>
+  <% if (!tests.length) { %><p class="vacio">Todavía no hay tests publicados<%= temaId ? ' en este tema' : '' %>.</p><% } else { %>
+  <div class="tabla-contenedor">
+    <table class="tabla-responsiva">
+      <thead><tr><th>Test</th><th>Tema</th><th>Presentaron</th><th>Promedio</th><th>Aprobaron</th><th></th></tr></thead>
+      <tbody>
+        <% tests.forEach(function (t) { var pct = t.presentaron ? Math.round(t.aprobaron / t.presentaron * 100) : null; %>
+          <tr>
+            <td data-label="Test"><strong><%= t.nombre %></strong><% if (t.estado === 'archivado') { %> <span class="etiqueta gris">Archivado</span><% } %></td>
+            <td data-label="Tema"><%= t.tema %></td>
+            <td data-label="Presentaron"><%= t.presentaron %> de <%= t.inscritos %></td>
+            <td data-label="Promedio"><span class="nota <%= t.promedio === null ? '' : (t.promedio >= t.puntaje_aprobacion ? 'verde' : 'rojo') %>"><%= t.promedio === null ? '—' : t.promedio %></span></td>
+            <td data-label="Aprobaron"><%= pct === null ? '—' : t.aprobaron + ' (' + pct + ' %)' %></td>
+            <td data-label=""><a class="enlace-boton" href="/docente/rendimiento?<%= temaId ? 'tema=' + temaId + '&' : '' %>test=<%= t.id %>">Ver detalle</a></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
+</section>
+<section class="tarjeta">
+  <h2>Estudiantes<%= temaId ? ' del tema' : '' %></h2>
+  <p class="texto-gris">Ordenados de menor a mayor promedio, para ver primero a quien necesita apoyo. El promedio usa la mejor nota de cada test.</p>
+  <% if (!estudiantes.length) { %><p class="vacio">No hay estudiantes inscritos.</p><% } else { %>
+  <div class="tabla-contenedor">
+    <table class="tabla-responsiva">
+      <thead><tr><th>Estudiante</th><th>Tests completados</th><th>Promedio</th><th>Último acceso</th><th></th></tr></thead>
+      <tbody>
+        <% estudiantes.forEach(function (e) { %>
+          <tr>
+            <td data-label="Estudiante"><strong><%= e.nombres %> <%= e.apellidos %></strong></td>
+            <td data-label="Tests completados"><%= e.completados %></td>
+            <td data-label="Promedio"><span class="nota <%= e.promedio === null ? '' : (e.promedio >= 70 ? 'verde' : 'rojo') %>"><%= e.promedio === null ? '—' : e.promedio %></span></td>
+            <td data-label="Último acceso"><%= fecha(e.ultimo_acceso) %></td>
+            <td data-label=""><a class="enlace-boton" href="/docente/rendimiento/estudiantes/<%= e.dni %>">Ver progreso</a></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
+</section>
+<%- include('../partials/finApp') %>

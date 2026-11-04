@@ -1,0 +1,35 @@
+<%- include('../partials/inicioApp', { titulo: titulo }) %>
+<div class="cabecera-seccion">
+  <p><%= temas.length %> <%= temas.length === 1 ? 'tema' : 'temas' %> · <%= activos %> <%= activos === 1 ? 'activo' : 'activos' %></p>
+  <a class="boton" href="/docente/temas/nuevo"><%- icono('MdAdd') %> Nuevo tema</a>
+</div>
+<% if (!temas.length) { %>
+  <div class="tarjeta vacio">
+    <p style="margin:0 0 12px">Todavía no tienes temas. Crea el primero, por ejemplo "Programación I" u "Ofimática".</p>
+    <a class="boton" href="/docente/temas/nuevo"><%- icono('MdAdd') %> Crear tema</a>
+  </div>
+<% } %>
+<div class="tarjetas-temas">
+  <% temas.forEach(function (t) { var activo = t.estado === 'activo'; %>
+    <article class="tarjeta tema <%= activo ? '' : 'inactivo' %>">
+      <div class="tema-cabeza">
+        <span class="circulo" style="background:<%= t.color %>"><%- icono('MdMenuBook') %></span>
+        <div class="tema-titulo">
+          <h2><%= t.nombre %></h2>
+          <p><%= t.descripcion || 'Sin descripción' %></p>
+        </div>
+        <span class="etiqueta <%= activo ? 'verde' : 'gris' %>"><%= activo ? 'Activo' : 'Inactivo' %></span>
+      </div>
+      <div class="tema-datos">
+        <span><%- icono('MdPeople') %> <%= t.estudiantes %> <%= t.estudiantes === 1 ? 'estudiante' : 'estudiantes' %></span>
+        <span><%- icono('MdQuiz') %> <%= t.tests %> <%= t.tests === 1 ? 'test' : 'tests' %></span>
+      </div>
+      <div class="tema-botones">
+        <a class="boton secundario chico" href="/docente/temas/<%= t.id %>/estudiantes" title="Inscribir estudiantes"><%- icono('MdPeople') %> Inscribir</a>
+        <a class="boton secundario chico" href="/docente/temas/<%= t.id %>/editar"><%- icono('MdEdit') %> Editar</a>
+        <a class="boton chico" href="/docente/examenes?tema=<%= t.id %>">Ver exámenes</a>
+      </div>
+    </article>
+  <% }) %>
+</div>
+<%- include('../partials/finApp') %>

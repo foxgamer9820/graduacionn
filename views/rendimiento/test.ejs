@@ -1,0 +1,54 @@
+<%- include('../partials/inicioApp', { titulo: titulo }) %>
+<%- include('_filtros') %>
+<div class="cabecera-seccion">
+  <div><h2 class="saludo" style="margin-bottom:4px"><%= test.nombre %></h2><p><%= test.tema %> · nota mínima <%= test.puntaje_aprobacion %></p></div>
+  <a class="boton secundario" href="/docente/rendimiento/tests/<%= test.id %>/exportar"><%- icono('MdDownload') %> Exportar a Excel (CSV)</a>
+</div>
+<div class="estadisticas">
+  <div class="tarjeta estadistica"><span class="circulo azul"><%- icono('MdTrendingUp') %></span><div><strong><%= stats.promedio === null ? '—' : stats.promedio %></strong><span>Promedio del grupo</span></div></div>
+  <div class="tarjeta estadistica"><span class="circulo verde"><%- icono('MdCheckCircle') %></span><div><strong><%= stats.aprobaron %> de <%= stats.presentaron %></strong><span>Aprobaron</span></div></div>
+  <div class="tarjeta estadistica"><span class="circulo morado"><%- icono('MdPeople') %></span><div><strong><%= stats.presentaron %> de <%= stats.inscritos %></strong><span>Presentaron</span></div></div>
+  <div class="tarjeta estadistica"><span class="circulo naranja"><%- icono('MdTimer') %></span><div><strong><%= stats.tiempo === null ? '—' : duracionTexto(Number(stats.tiempo)) %></strong><span>Tiempo promedio</span></div></div>
+</div>
+<div class="dos-columnas">
+  <section class="tarjeta">
+    <h2>Aciertos por pregunta</h2>
+    <% var dificiles = preguntas.filter(function (p) { return p.porcentaje !== null && p.porcentaje < 50; }); %>
+    <% if (!stats.presentaron) { %><p class="vacio">Aparecerá cuando alguien termine el test.</p><% } else { %>
+      <% if (dificiles.length) { %>
+        <div class="mensaje error"><%- icono('MdWarning') %><span><%= dificiles.map(function (p) { return 'P' + p.numero; }).join(', ') %>: menos de la mitad acertó. Conviene repasar ese contenido.</span></div>
+      <% } %>
+      <ol class="aciertos">
+        <% preguntas.forEach(function (p) { var baja = p.porcentaje !== null && p.porcentaje < 50; %>
+          <li>
+            <div class="aciertos-cabeza"><span class="numero">P<%= p.numero %></span><span class="texto"><%= p.pregunta %></span><strong class="<%= baja ? 'rojo' : '' %>"><%= p.porcentaje === null ? '—' : p.porcentaje + ' %' %></strong></div>
+            <div class="barra" role="img" aria-label="Pregunta <%= p.numero %>: <%= p.porcentaje || 0 %> por ciento de aciertos"><span style="width:<%= p.porcentaje || 0 %>%; background:<%= baja ? 'var(--rojo)' : 'var(--azul)' %>"></span></div>
+            <% if (p.confusion && baja) { %><small class="confusion">Respuesta incorrecta más elegida: <%= p.confusion.letra %>) <%= p.confusion.texto %> (<%= p.confusion.veces %>)</small><% } %>
+          </li>
+        <% }) %>
+      </ol>
+    <% } %>
+  </section>
+  <section class="tarjeta">
+    <h2>Resultados por estudiante</h2>
+    <p class="texto-gris">Se muestra la mejor nota de cada estudiante.</p>
+    <div class="tabla-contenedor">
+      <table class="tabla-responsiva">
+        <thead><tr><th>Estudiante</th><th>Nota</th><th>Estado</th><th></th></tr></thead>
+        <tbody>
+          <% if (!estudiantes.length) { %><tr><td colspan="4" class="vacio">No hay estudiantes inscritos en el tema.</td></tr><% } %>
+          <% estudiantes.forEach(function (e) {
+               var estado = e.mejor === null ? (e.en_curso ? ['En curso', 'naranja'] : ['Sin presentar', 'gris']) : (e.aprobado ? ['Aprobado', 'verde'] : ['Reprobado', 'rojo']); %>
+            <tr>
+              <td data-label="Estudiante"><a href="/docente/rendimiento/estudiantes/<%= e.dni %>"><strong><%= e.nombres %> <%= e.apellidos %></strong></a><br><small style="color:var(--gris-texto)"><%= e.intentos %> <%= e.intentos === 1 ? 'intento' : 'intentos' %></small></td>
+              <td data-label="Nota"><%= e.mejor === null ? '—' : nota(e.mejor) %></td>
+              <td data-label="Estado"><span class="etiqueta <%= estado[1] %>"><%= estado[0] %></span></td>
+              <td data-label=""><% if (e.mejor_id) { %><a class="enlace-boton" href="/docente/rendimiento/intentos/<%= e.mejor_id %>">Ver respuestas</a><% } %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+<%- include('../partials/finApp') %>

@@ -1,0 +1,7 @@
+<%- include('partials/inicioApp', { titulo: titulo }) %>
+<div class="tarjeta" style="text-align:center; max-width:560px; margin:40px auto">
+  <div class="icono-grande naranja"><%- icono('MdConstruction') %></div>
+  <h2><%= titulo %></h2>
+  <p class="sub" style="color:var(--gris-texto)">Esta pantalla se construye en el Sprint <%= sprint %>.</p>
+</div>
+<%- include('partials/finApp') %>

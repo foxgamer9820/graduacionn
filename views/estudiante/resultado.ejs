@@ -1,0 +1,29 @@
+<%- include('../partials/inicioApp', { titulo: 'Resultado: ' + intento.test, seccion: seccion }) %>
+<% var aprobado = intento.aprobado === 1; var cal = Number(intento.calificacion); %>
+<div class="resultado">
+  <section class="tarjeta resultado-nota">
+    <div class="anillo <%= aprobado ? 'verde' : 'rojo' %>" style="--porcentaje: <%= cal %>" role="img" aria-label="Calificación: <%= nota(cal) %> de 100">
+      <div><strong><%= nota(cal) %></strong><small>de 100</small></div>
+    </div>
+    <span class="etiqueta <%= aprobado ? 'verde' : 'rojo' %>" style="font-size:14px"><%= aprobado ? 'Aprobado' : 'Reprobado' %></span>
+    <dl class="datos-resultado">
+      <dt>Correctas</dt><dd><%= intento.correctas %> de <%= intento.total_preguntas %></dd>
+      <dt>Tiempo</dt><dd><%= duracionTexto(intento.tiempo_segundos) %></dd>
+      <dt>Intento</dt><dd><%= intento.intento %> de <%= intento.intentos_max %></dd>
+      <dt>Nota mínima</dt><dd><%= intento.puntaje_aprobacion %></dd>
+    </dl>
+    <% if (puedeReintentar) { %>
+      <form method="post" action="/estudiante/tests/<%= intento.test_id %>/comenzar"><button class="boton ancho" type="submit">Intentar de nuevo</button></form>
+    <% } %>
+    <a class="boton secundario ancho" href="/estudiante" style="margin-top:8px">Volver a mis tests</a>
+  </section>
+
+  <section class="tarjeta">
+    <h2>Revisión de respuestas</h2>
+    <% if (!intento.mostrar_respuestas) { %>
+      <div class="mensaje info"><%- icono('MdInfo') %><span>Tu docente decidió no mostrar las respuestas correctas de este test.</span></div>
+    <% } %>
+    <%- include('../partials/revision', { revision: revision }) %>
+  </section>
+</div>
+<%- include('../partials/finApp') %>

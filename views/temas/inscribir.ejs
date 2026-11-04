@@ -1,0 +1,48 @@
+<%- include('../partials/inicioApp', { titulo: titulo }) %>
+<% var inscritos = estudiantes.filter(function (e) { return e.inscrito; }).length; %>
+<div class="formulario-cuenta">
+  <a class="enlace-boton" href="/docente/temas" style="display:inline-flex; gap:4px; align-items:center; margin-bottom:12px"><%- icono('MdArrowBack') %> Volver a temas</a>
+  <section class="tarjeta">
+    <div class="tema-cabeza" style="margin-bottom:16px">
+      <span class="circulo" style="background:<%= tema.color %>"><%- icono('MdMenuBook') %></span>
+      <div class="tema-titulo"><h2>Inscribir estudiantes en <%= tema.nombre %></h2><p><span id="conteo-inscritos"><%= inscritos %></span> de <%= estudiantes.length %> seleccionados</p></div>
+    </div>
+    
+    <% if (!estudiantes.length) { %>
+      <div class="mensaje info"><%- icono('MdInfo') %><span>Todavía no tienes estudiantes. Créalos en el menú Estudiantes o agrégalos por DNI aquí abajo.</span></div>
+    <% } else { %>
+      <form id="form-inscribir" method="post" action="/docente/temas/<%= tema.id %>/estudiantes">
+        <div class="barra-herramientas">
+          <div class="campo" style="margin:0; flex:1">
+            <label for="filtro" class="oculto-visual">Filtrar</label>
+            <input type="search" id="filtro" placeholder="Filtrar por nombre o DNI">
+          </div>
+          <button type="button" class="boton secundario chico" id="marcar-todos">Seleccionar todos</button>
+          <button type="button" class="boton secundario chico" id="desmarcar-todos">Quitar todos</button>
+        </div>
+        <div class="casillas lista-inscribir">
+          <% estudiantes.forEach(function (e) { %>
+            <label class="casilla" data-buscar="<%= (e.nombres + ' ' + e.apellidos + ' ' + e.dni).toLowerCase() %>">
+              <input type="checkbox" name="estudiantes" value="<%= e.dni %>" <%= e.inscrito ? 'checked' : '' %>>
+              <span><%= e.nombres %> <%= e.apellidos %><br><small style="color:var(--gris-texto)"><%= e.dni %><%= e.estado === 'inactivo' ? ' · inactiva' : '' %></small></span>
+            </label>
+          <% }) %>
+        </div>
+        <div class="botones">
+          <a class="boton secundario" href="/docente/temas">Cancelar</a>
+          <button class="boton" type="submit">Guardar inscripciones</button>
+        </div>
+      </form>
+    <% } %>
+  </section>
+
+  <section class="tarjeta" style="margin-top:16px">
+    <h2>Agregar un estudiante que ya tiene cuenta</h2>
+    <p style="color:var(--gris-texto); font-size:14px; margin:0 0 12px">Por ejemplo, si su cuenta la creó otro docente.</p>
+    <form class="asignar" method="post" action="/docente/temas/<%= tema.id %>/estudiantes/dni">
+      <div class="campo"><label for="dni-agregar">DNI del estudiante</label><input id="dni-agregar" name="dni" inputmode="numeric" maxlength="15" placeholder="13 números, sin guiones" required></div>
+      <button class="boton" type="submit"><%- icono('MdAdd') %> Inscribir</button>
+    </form>
+  </section>
+</div>
+<%- include('../partials/finApp') %>

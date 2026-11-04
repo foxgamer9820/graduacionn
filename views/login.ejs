@@ -1,0 +1,32 @@
+<%- include('partials/head', { titulo: 'Iniciar sesión' }) %>
+<body>
+<div class="acceso">
+  <section class="acceso-bienvenida">
+    <h1>Software educativo de ejercitación tutorial</h1>
+    <p>Profesorado en Informática Educativa · UPNFM CURNAC</p>
+    <ul>
+      <li><span class="circulo"><%- icono('MdQuiz') %></span> Tests de selección única</li>
+      <li><span class="circulo"><%- icono('MdCheckCircle') %></span> Retroalimentación inmediata</li>
+      <li><span class="circulo"><%- icono('MdTrendingUp') %></span> Seguimiento del rendimiento</li>
+    </ul>
+  </section>
+  <main class="acceso-formulario">
+    <div class="tarjeta acceso-tarjeta">
+      <%- include('partials/logos') %>
+      <h2>Iniciar sesión</h2>
+      <p class="sub">Ingresa con tu número de identidad</p>
+      <% if (error) { %><div class="mensaje error" role="alert"><%- icono('MdCancel') %><span><%= error %></span></div><% } %>
+      <% if (aviso) { %><div class="mensaje info" role="status"><%- icono('MdInfo') %><span><%= aviso %></span></div><% } %>
+      <form method="post" action="/login" novalidate>
+        <div class="campo">
+          <label for="dni">Número de identidad (DNI)</label>
+          <input type="text" id="dni" name="dni" value="<%= dni %>" inputmode="numeric" maxlength="15" placeholder="13 números, sin guiones" autocomplete="username" required autofocus>
+        </div>
+        <%- include('partials/campoClave', { id: 'clave', etiqueta: 'Contraseña' }) %>
+        <button class="boton ancho" type="submit">Ingresar</button>
+      </form>
+      <p class="nota-centro">¿Olvidaste tu contraseña? Pide a tu docente que la restablezca.</p>
+    </div>
+  </main>
+</div>
+<%- include('partials/fin') %>

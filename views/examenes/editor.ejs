@@ -1,0 +1,90 @@
+<%- include('../partials/inicioApp', { titulo: titulo }) %>
+<%
+  var nombres = { publicado: 'Publicado', borrador: 'Borrador', archivado: 'Archivado' };
+  var clases = { publicado: 'verde', borrador: 'naranja', archivado: 'gris' };
+  var bloqueado = test.intentos_realizados > 0;
+  var base = '/docente/examenes/' + test.id;
+%>
+<a class="enlace-boton" href="/docente/examenes" style="display:inline-flex; gap:4px; align-items:center; margin-bottom:12px"><%- icono('MdArrowBack') %> Volver a exámenes</a>
+<div class="cabecera-seccion">
+  <div>
+    <h2 class="saludo" style="margin-bottom:6px"><%= test.nombre %></h2>
+    <p><span class="punto" style="background:<%= test.tema_color %>"></span><%= test.tema %> · <span class="etiqueta <%= clases[test.estado] %>"><%= nombres[test.estado] %></span></p>
+  </div>
+</div>
+<% if (bloqueado) { %>
+  <div class="mensaje aviso"><%- icono('MdLock') %><span>Este test ya tiene <%= test.intentos_realizados %> <%= test.intentos_realizados === 1 ? 'intento' : 'intentos' %> de estudiantes. Las preguntas no se pueden cambiar para no alterar las notas. Si necesitas cambiarlas, duplica el test.</span></div>
+<% } %>
+
+<div class="editor-test">
+  <div class="columna">
+    <section class="tarjeta">
+      <h2>Configuración</h2>
+      <%- include('../partials/mensajes') %>
+      <form id="form-test" method="post" action="<%= base %>">
+        <%- include('_config') %>
+        <div class="botones"><button class="boton" type="submit">Guardar configuración</button></div>
+      </form>
+    </section>
+
+    <section class="tarjeta" style="margin-top:16px">
+      <h2>Estado del test</h2>
+      <p class="texto-gris">
+        <% if (test.estado === 'borrador') { %>Los estudiantes todavía no lo ven. Publícalo cuando tenga todas sus preguntas.<% } %>
+        <% if (test.estado === 'publicado') { %>Los estudiantes inscritos en <%= test.tema %> lo ven<%= test.fecha_apertura ? ' desde el ' + fecha(test.fecha_apertura, true) : '' %><%= test.fecha_cierre ? ' hasta el ' + fecha(test.fecha_cierre, true) : '' %>.<% } %>
+        <% if (test.estado === 'archivado') { %>Los estudiantes ya no lo ven. Sus notas se conservan.<% } %>
+      </p>
+      <div class="botones" style="justify-content:flex-start">
+        <% if (test.estado !== 'publicado') { %>
+          <form method="post" action="<%= base %>/estado"><input type="hidden" name="accion" value="publicar">
+            <button class="boton exito" type="submit"><%= test.estado === 'archivado' ? 'Publicar de nuevo' : 'Publicar test' %></button></form>
+        <% } else { %>
+          <form method="post" action="<%= base %>/estado"><input type="hidden" name="accion" value="archivar"><button class="boton secundario" type="submit">Archivar</button></form>
+          <% if (!bloqueado) { %>
+            <form method="post" action="<%= base %>/estado"><input type="hidden" name="accion" value="borrador"><button class="boton secundario" type="submit">Volver a borrador</button></form>
+          <% } %>
+        <% } %>
+        <form method="post" action="<%= base %>/duplicar"><button class="boton secundario" type="submit">Duplicar</button></form>
+        <form method="post" action="<%= base %>/eliminar" data-confirmar="<%= bloqueado ? 'Este test tiene intentos: se archivará en lugar de borrarse. ¿Continuar?' : '¿Eliminar el test ' + test.nombre + ' y todas sus preguntas?' %>">
+          <button class="boton peligro" type="submit">Eliminar</button></form>
+      </div>
+    </section>
+  </div>
+
+  <section class="tarjeta columna">
+    <div class="cabecera-seccion" style="margin-bottom:12px">
+      <h2 style="margin:0">Preguntas (<%= preguntas.length %>)</h2>
+      <% if (!bloqueado) { %><a class="boton chico" href="<%= base %>/preguntas/nueva"><%- icono('MdAdd') %> Agregar pregunta</a><% } %>
+    </div>
+    <div class="mensaje info"><%- icono('MdInfo') %><span>Las preguntas salen en orden aleatorio a cada estudiante.</span></div>
+    <% if (!preguntas.length) { %>
+      <p class="vacio">Todavía no hay preguntas. Cada pregunta tiene 4 opciones y una sola respuesta correcta.</p>
+    <% } %>
+    <ol class="lista-preguntas">
+      <% preguntas.forEach(function (p, i) { %>
+        <li>
+          <div class="pregunta-encabezado">
+            <span class="numero"><%= i + 1 %></span>
+            <p class="enunciado"><%= p.pregunta %></p>
+            <span class="etiqueta azul"><%= p.puntos %> <%= p.puntos === 1 ? 'punto' : 'puntos' %></span>
+          </div>
+          <p class="correcta"><%- icono('MdCheckCircle') %> <%= 'abcd'[p.respuesta_correcta - 1] %>) <%= p['opcion' + p.respuesta_correcta] %></p>
+          <div class="pregunta-pie">
+            <span class="texto-gris">
+              <% if (p.imagen) { %><%- icono('MdImage') %> Con imagen · <% } %>
+              <%= p.retroalimentacion ? 'Con retroalimentación' : 'Sin retroalimentación' %>
+            </span>
+            <% if (!bloqueado) { %>
+              <span class="acciones">
+                <a class="enlace-boton" href="<%= base %>/preguntas/<%= p.id %>/editar">Editar</a>
+                <form method="post" action="<%= base %>/preguntas/<%= p.id %>/eliminar" data-confirmar="¿Eliminar la pregunta <%= i + 1 %>?"><button class="enlace-boton rojo" type="submit">Eliminar</button></form>
+              </span>
+            <% } %>
+          </div>
+        </li>
+      <% }) %>
+    </ol>
+    <% if (preguntas.length) { %><p class="texto-gris" style="margin:12px 0 0">Total: <%= test.total_puntos %> puntos. La calificación se calcula sobre 100.</p><% } %>
+  </section>
+</div>
+<%- include('../partials/finApp') %>

@@ -1,0 +1,80 @@
+<%- include('../partials/inicioApp', { titulo: titulo, seccion: ctx.base }) %>
+<%
+  var base = ctx.base;
+  var nuevo = modo === 'nuevo';
+  var accion = nuevo ? base : base + '/' + dniOriginal;
+%>
+<div class="formulario-cuenta">
+  <a class="enlace-boton" href="<%= base %>?tipo=<%= datos.tipo %>" style="display:inline-flex; gap:4px; align-items:center; margin-bottom:12px"><%- icono('MdArrowBack') %> Volver a la lista</a>
+  <section class="tarjeta">
+    <h2><%= nuevo ? 'Nueva cuenta de ' + NOMBRE_TIPO[datos.tipo] : 'Editar ' + NOMBRE_TIPO[datos.tipo] %></h2>
+    <%- include('../partials/mensajes') %>
+
+    <% if (nuevo && ctx.tipos.length > 1) { %>
+      <div class="grupo-titulo">Tipo de cuenta</div>
+      <div class="selector-tipo">
+        <% ctx.tipos.forEach(function (t) { %>
+          <a href="<%= base %>/nuevo?tipo=<%= t %>" class="<%= datos.tipo === t ? 'activo' : '' %>"><%= t === 'estudiante' ? 'Estudiante' : 'Padre o encargado' %></a>
+        <% }) %>
+      </div>
+    <% } %>
+
+    <form id="form-cuenta" method="post" action="<%= accion %>">
+      <input type="hidden" name="tipo" value="<%= datos.tipo %>">
+      <div class="fila">
+        <div class="campo">
+          <label for="dni">Número de identidad (DNI)</label>
+          <input id="dni" name="dni" value="<%= datos.dni %>" inputmode="numeric" maxlength="15" placeholder="13 números, sin guiones" required>
+          <% if (!nuevo) { %><div class="ayuda">Si lo corriges, se actualiza en todos sus registros.</div><% } %>
+        </div>
+        <% if (datos.tipo === 'tutor') { %>
+          <div class="campo">
+            <label for="parentesco">Parentesco</label>
+            <select id="parentesco" name="parentesco">
+              <% PARENTESCOS.forEach(function (p) { %><option value="<%= p %>" <%= datos.parentesco === p ? 'selected' : '' %>><%= p.charAt(0).toUpperCase() + p.slice(1) %></option><% }) %>
+            </select>
+          </div>
+        <% } else { %><div></div><% } %>
+        <div class="campo"><label for="nombres">Nombres</label><input id="nombres" name="nombres" value="<%= datos.nombres %>" maxlength="60" required></div>
+        <div class="campo"><label for="apellidos">Apellidos</label><input id="apellidos" name="apellidos" value="<%= datos.apellidos %>" maxlength="60" required></div>
+        <div class="campo"><label for="telefono">Teléfono (opcional)</label><input id="telefono" name="telefono" value="<%= datos.telefono %>" inputmode="tel" maxlength="15" placeholder="9876-5432"></div>
+        <div class="campo"><label for="email">Correo (opcional)</label><input type="email" id="email" name="email" value="<%= datos.email %>" maxlength="100" placeholder="correo@ejemplo.com"></div>
+      </div>
+
+      <% if (datos.tipo === 'estudiante') { %>
+        <div class="grupo-titulo">Inscribir en los temas</div>
+        <% if (temas.length) { %>
+          <div class="casillas">
+            <% temas.forEach(function (t) { %>
+              <label class="casilla"><input type="checkbox" name="temas" value="<%= t.id %>" <%= datos.temas.indexOf(t.id) >= 0 ? 'checked' : '' %>> <%= t.nombre %></label>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <p class="ayuda" style="font-size:13px; color:var(--gris-texto); margin:0 0 14px">Todavía no tienes temas activos. Podrás inscribirlo cuando los crees.</p>
+        <% } %>
+      <% } %>
+
+      <% if (datos.tipo === 'tutor') { %>
+        <div class="grupo-titulo">Estudiantes vinculados</div>
+        <% if (estudiantes.length) { %>
+          <div class="casillas">
+            <% estudiantes.forEach(function (e) { %>
+              <label class="casilla"><input type="checkbox" name="estudiantes" value="<%= e.dni %>" <%= datos.estudiantes.indexOf(e.dni) >= 0 ? 'checked' : '' %>> <%= e.nombres %> <%= e.apellidos %></label>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <p class="ayuda" style="font-size:13px; color:var(--gris-texto); margin:0 0 14px">Primero crea la cuenta del estudiante para poder vincularlo.</p>
+        <% } %>
+      <% } %>
+
+      <% if (nuevo) { %>
+        <div class="mensaje info"><%- icono('MdInfo') %><span>El sistema generará una contraseña temporal. La persona deberá cambiarla en su primer ingreso.</span></div>
+      <% } %>
+      <div class="botones">
+        <a class="boton secundario" href="<%= base %>?tipo=<%= datos.tipo %>">Cancelar</a>
+        <button class="boton" type="submit"><%= nuevo ? 'Crear cuenta' : 'Guardar cambios' %></button>
+      </div>
+    </form>
+  </section>
+</div>
+<%- include('../partials/finApp') %>

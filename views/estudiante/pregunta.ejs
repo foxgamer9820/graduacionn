@@ -1,0 +1,56 @@
+<%- include('../partials/head', { titulo: titulo }) %>
+<body class="modo-test">
+<header class="test-encabezado">
+  <div class="test-nombre"><strong><%= intento.test %></strong><small><%= intento.tema %></small></div>
+  <div class="test-avance">
+    <span>Pregunta <%= posicion %> de <%= intento.total_preguntas %></span>
+    <div class="barra" role="progressbar" aria-label="Avance del test" aria-valuemin="1" aria-valuemax="<%= intento.total_preguntas %>" aria-valuenow="<%= posicion %>"><span style="width:<%= Math.round(posicion / intento.total_preguntas * 100) %>%"></span></div>
+  </div>
+  <div class="reloj" id="reloj" data-segundos="<%= intento.segundos_restantes %>" role="timer" aria-live="off">
+    <%- icono('MdTimer') %> <span id="reloj-texto"><%= Math.floor(intento.segundos_restantes / 60) %>:<%= String(intento.segundos_restantes % 60).padStart(2, '0') %></span><span class="oculto-visual"> restantes</span>
+  </div>
+</header>
+<main class="test-cuerpo">
+  <form id="form-respuesta" method="post" action="/estudiante/intentos/<%= intento.id %>/<%= posicion %>" data-ajax="/estudiante/intentos/<%= intento.id %>/<%= posicion %>">
+    <section class="tarjeta pregunta-tarjeta">
+      <p class="pregunta-numero">PREGUNTA <%= posicion %><span> · <%= pregunta.puntos %> <%= pregunta.puntos === 1 ? 'punto' : 'puntos' %></span></p>
+      <fieldset>
+        <legend class="pregunta-texto"><%= pregunta.pregunta %></legend>
+        <% if (pregunta.imagen) { %><img class="pregunta-imagen" src="<%= pregunta.imagen %>" alt="<%= pregunta.imagen_alt %>"><% } %>
+        <div class="opciones-test">
+          <% [1, 2, 3, 4].forEach(function (n) { %>
+            <label class="opcion-test">
+              <input type="radio" name="opcion" value="<%= n %>" <%= pregunta.opcion_elegida === n ? 'checked' : '' %>>
+              <span class="letra"><%= 'abcd'[n - 1] %></span>
+              <span class="texto"><%= pregunta['opcion' + n] %></span>
+            </label>
+          <% }) %>
+        </div>
+      </fieldset>
+      <p class="estado-guardado" id="estado-guardado" aria-live="polite"><%= pregunta.opcion_elegida ? 'Respuesta guardada' : '' %></p>
+    </section>
+
+    <nav class="test-navegacion" aria-label="Navegación del test">
+      <button class="boton secundario" type="submit" name="ir" value="anterior" <%= posicion === 1 ? 'disabled' : '' %>>‹ Anterior</button>
+      <div class="puntos-navegacion">
+        <% mapa.forEach(function (m) { %>
+          <button type="submit" name="ir" value="<%= m.posicion %>" class="punto-nav <%= m.respondida ? 'respondida' : '' %> <%= m.posicion === posicion ? 'actual' : '' %>"
+            aria-label="Pregunta <%= m.posicion %><%= m.respondida ? ', respondida' : '' %>" <%= m.posicion === posicion ? 'aria-current=step' : '' %> data-pos="<%= m.posicion %>"><%= m.posicion %></button>
+        <% }) %>
+      </div>
+      <% if (posicion < intento.total_preguntas) { %>
+        <button class="boton" type="submit" name="ir" value="siguiente">Siguiente ›</button>
+      <% } else { %>
+        <button class="boton exito" type="submit" name="ir" value="terminar">Revisar y entregar</button>
+      <% } %>
+    </nav>
+  </form>
+  <form id="form-tiempo" method="post" action="/estudiante/intentos/<%= intento.id %>/<%= posicion %>">
+    <input type="hidden" name="ir" value="terminar"><input type="hidden" name="confirmado" value="1"><input type="hidden" name="opcion" id="opcion-tiempo">
+  </form>
+</main>
+<script src="/js/jquery.min.js"></script>
+<script src="/js/app.js?v=<%= v %>"></script>
+<script src="/js/test.js?v=<%= v %>"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+<% if (typeof errores !== 'undefined' && errores.length) { %>
+  <div class="mensaje error" role="alert">
+    <%- icono('MdCancel') %>
+    <ul><% errores.forEach(function (e) { %><li><%= e %></li><% }) %></ul>
+  </div>
+<% } %>

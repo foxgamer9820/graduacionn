@@ -1,0 +1,125 @@
+<%- include('../partials/inicioApp', { titulo: titulo }) %>
+<%
+  var base = ctx.base;
+  var esDocente = ctx.clave === 'docente';
+  var nombrePlural = { docente: 'docentes', estudiante: 'estudiantes', tutor: 'padres o encargados' }[tipo];
+  var columnaDetalle = { docente: 'Temas', estudiante: 'Temas', tutor: 'Estudiantes vinculados' }[tipo];
+  function enlace(extra) {
+    var p = { tipo: tipo, q: q, estado: estado, tema: temaId || '', pagina: 1 };
+    for (var k in extra) p[k] = extra[k];
+    return base + '?' + Object.keys(p).filter(function (k) { return p[k] !== '' && p[k] !== 0; })
+      .map(function (k) { return k + '=' + encodeURIComponent(p[k]); }).join('&');
+  }
+%>
+<div class="cabecera-seccion">
+  <p><%= total %> <%= total === 1 ? 'cuenta' : 'cuentas' %><% if (pendientes) { %> · <%= pendientes %> <%= pendientes === 1 ? 'pendiente' : 'pendientes' %> de activar<% } %></p>
+  <a class="boton" href="<%= base %>/nuevo?tipo=<%= tipo %>"><%- icono('MdAdd') %> Crear cuenta</a>
+</div>
+
+<% if (esDocente) { %>
+  <nav class="pestanas" aria-label="Tipo de cuenta">
+    <a href="<%= base %>?tipo=estudiante" class="<%= tipo === 'estudiante' ? 'activa' : '' %>">Estudiantes</a>
+    <a href="<%= base %>?tipo=tutor" class="<%= tipo === 'tutor' ? 'activa' : '' %>">Padres o encargados</a>
+  </nav>
+<% } %>
+
+<form class="filtros" method="get" action="<%= base %>">
+  <input type="hidden" name="tipo" value="<%= tipo %>">
+  <div class="campo">
+    <label for="q" class="oculto-visual">Buscar</label>
+    <input type="search" id="q" name="q" value="<%= q %>" placeholder="Buscar por nombre o DNI">
+  </div>
+  <% if (esDocente && tipo === 'estudiante') { %>
+    <div class="campo">
+      <label for="tema" class="oculto-visual">Tema</label>
+      <select id="tema" name="tema">
+        <option value="">Tema: todos</option>
+        <% temas.forEach(function (t) { %><option value="<%= t.id %>" <%= temaId === t.id ? 'selected' : '' %>><%= t.nombre %></option><% }) %>
+      </select>
+    </div>
+  <% } else { %><div></div><% } %>
+  <div class="campo">
+    <label for="estado" class="oculto-visual">Estado</label>
+    <select id="estado" name="estado">
+      <option value="">Estado: todos</option>
+      <option value="activa" <%= estado === 'activa' ? 'selected' : '' %>>Activa</option>
+      <option value="pendiente" <%= estado === 'pendiente' ? 'selected' : '' %>>Pendiente</option>
+      <option value="inactiva" <%= estado === 'inactiva' ? 'selected' : '' %>>Inactiva</option>
+    </select>
+  </div>
+  <button class="boton secundario" type="submit"><%- icono('MdSearch') %> Buscar</button>
+</form>
+
+<div class="tabla-contenedor">
+  <table class="tabla-responsiva">
+    <thead>
+      <tr><th>DNI</th><th>Nombre</th><th><%= columnaDetalle %></th><th>Último acceso</th><th>Estado</th><th>Acciones</th></tr>
+    </thead>
+    <tbody>
+      <% if (!cuentas.length) { %>
+        <tr><td colspan="6" class="vacio">No hay <%= nombrePlural %> <%= q || estado || temaId ? 'que coincidan con la búsqueda' : 'registrados todavía' %>.</td></tr>
+      <% } %>
+      <% cuentas.forEach(function (c) { var est = estadoCuenta(c); %>
+        <tr>
+          <td class="dni" data-label="DNI"><%= c.dni %></td>
+          <td data-label="Nombre"><strong><%= c.nombres %> <%= c.apellidos %></strong><% if (c.email) { %><br><small style="color:var(--gris-texto)"><%= c.email %></small><% } %></td>
+          <td data-label="<%= columnaDetalle %>"><%= tipo === 'docente' ? c.detalle : (c.detalle || '—') %></td>
+          <td data-label="Último acceso"><%= fecha(c.ultimo_acceso) %></td>
+          <td data-label="Estado"><span class="etiqueta <%= est.clase %>"><%= est.texto %></span></td>
+          <td data-label="Acciones">
+            <div class="acciones">
+              <a class="enlace-boton" href="<%= base %>/<%= c.dni %>/editar">Editar</a>
+              <form method="post" action="<%= base %>/<%= c.dni %>/clave" data-confirmar="Se generará una nueva contraseña temporal para <%= c.nombres %>. ¿Continuar?">
+                <button class="enlace-boton" type="submit">Clave</button>
+              </form>
+              <form method="post" action="<%= base %>/<%= c.dni %>/estado">
+                <button class="enlace-boton" type="submit"><%= c.estado === 'activo' ? 'Desactivar' : 'Activar' %></button>
+              </form>
+              <form method="post" action="<%= base %>/<%= c.dni %>/eliminar" data-confirmar="¿Eliminar la cuenta de <%= c.nombres %> <%= c.apellidos %>? Si tiene historial, solo se desactivará.">
+                <button class="enlace-boton rojo" type="submit">Eliminar</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<div class="paginacion">
+  <span>Mostrando <%= cuentas.length %> de <%= total %></span>
+  <% if (paginas > 1) { %>
+    <nav aria-label="Páginas">
+      <% for (var i = 1; i <= paginas; i++) { %>
+        <% if (i === pagina) { %><span class="actual" aria-current="page"><%= i %></span><% } else { %><a href="<%= enlace({ pagina: i }) %>"><%= i %></a><% } %>
+      <% } %>
+    </nav>
+  <% } %>
+</div>
+
+<% if (ctx.clave === 'admin') { %>
+  <section class="tarjeta" style="margin-top:20px">
+    <h2>Asignar tema a un docente</h2>
+    <% if (!temasTodos.length) { %>
+      <p style="color:var(--gris-texto); margin:0">Todavía no hay temas. Los docentes los crean desde su menú Temas.</p>
+    <% } else { %>
+      <form class="asignar" method="post" action="/admin/temas/asignar">
+        <div class="campo">
+          <label for="tema-asignar">Tema</label>
+          <select id="tema-asignar" name="tema" required>
+            <% temasTodos.forEach(function (t) { %><option value="<%= t.id %>"><%= t.nombre %> (ahora: <%= t.docente %>)</option><% }) %>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="docente-asignar">Docente</label>
+          <select id="docente-asignar" name="docente" required>
+            <% docentesActivos.forEach(function (d) { %><option value="<%= d.dni %>"><%= d.nombres %> <%= d.apellidos %></option><% }) %>
+          </select>
+        </div>
+        <button class="boton" type="submit">Asignar</button>
+      </form>
+      <p style="color:var(--gris-texto); font-size:13px; margin:4px 0 0">Los estudiantes inscritos y los tests del tema pasan al nuevo docente.</p>
+    <% } %>
+  </section>
+<% } %>
+<%- include('../partials/finApp') %>

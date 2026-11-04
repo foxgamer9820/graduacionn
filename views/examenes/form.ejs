@@ -1,0 +1,17 @@
+<%- include('../partials/inicioApp', { titulo: titulo }) %>
+<div class="formulario-cuenta">
+  <a class="enlace-boton" href="/docente/examenes" style="display:inline-flex; gap:4px; align-items:center; margin-bottom:12px"><%- icono('MdArrowBack') %> Volver a exámenes</a>
+  <section class="tarjeta">
+    <h2>Nuevo test</h2>
+    <%- include('../partials/mensajes') %>
+    <form id="form-test" method="post" action="/docente/examenes">
+      <%- include('_config') %>
+      <div class="mensaje info" style="margin-top:16px"><%- icono('MdInfo') %><span>El test se guarda como borrador. Después agregas las preguntas y lo publicas.</span></div>
+      <div class="botones">
+        <a class="boton secundario" href="/docente/examenes">Cancelar</a>
+        <button class="boton" type="submit">Crear y agregar preguntas</button>
+      </div>
+    </form>
+  </section>
+</div>
+<%- include('../partials/finApp') %>

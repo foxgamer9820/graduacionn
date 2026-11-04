@@ -1,0 +1,26 @@
+<%- include('partials/head', { titulo: 'Cambiar contraseña' }) %>
+<body>
+<main class="centrado">
+  <div class="tarjeta acceso-tarjeta">
+    <div class="icono-grande naranja"><%- icono('MdLock') %></div>
+    <h2 style="text-align:center">Crea tu nueva contraseña</h2>
+    <p class="sub" style="text-align:center">
+      <%= obligatorio ? 'Es tu primer ingreso o tu contraseña fue restablecida. Cambia la contraseña temporal que te dio tu docente.' : 'Escribe tu contraseña actual y la nueva.' %>
+    </p>
+    <%- include('partials/mensajes') %>
+    <form method="post" action="/cambiar-clave">
+      <%- include('partials/campoClave', { id: 'actual', etiqueta: obligatorio ? 'Contraseña temporal' : 'Contraseña actual' }) %>
+      <%- include('partials/campoClave', { id: 'nueva', etiqueta: 'Nueva contraseña', auto: 'new-password' }) %>
+      <%- include('partials/campoClave', { id: 'confirmar', etiqueta: 'Confirmar nueva contraseña', auto: 'new-password' }) %>
+      <ul class="requisitos" aria-label="Requisitos de la contraseña">
+        <li data-req="largo"><%- icono('MdCheckCircle') %> Mínimo 8 caracteres</li>
+        <li data-req="numero"><%- icono('MdCheckCircle') %> Al menos un número</li>
+        <li data-req="letra"><%- icono('MdCheckCircle') %> Al menos una letra</li>
+        <li data-req="coinciden"><%- icono('MdCheckCircle') %> Las dos contraseñas coinciden</li>
+      </ul>
+      <button class="boton ancho" type="submit">Guardar y continuar</button>
+    </form>
+    <form method="post" action="/logout"><p class="nota-centro"><button class="enlace-boton" type="submit">Cerrar sesión</button></p></form>
+  </div>
+</main>
+<%- include('partials/fin') %>

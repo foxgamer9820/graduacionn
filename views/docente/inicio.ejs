@@ -1,0 +1,28 @@
+<%- include('../partials/inicioApp', { titulo: 'Inicio' }) %>
+<h2 class="saludo">Hola, <%= primerNombre(usuario.nombres) %></h2>
+<p style="color:var(--gris-texto); margin:0 0 18px">Así van tus grupos</p>
+<div class="estadisticas">
+  <div class="tarjeta estadistica"><span class="circulo azul"><%- icono('MdPeople') %></span><div><strong><%= conteos.estudiantes %></strong><span>Estudiantes</span></div></div>
+  <div class="tarjeta estadistica"><span class="circulo verde"><%- icono('MdMenuBook') %></span><div><strong><%= conteos.temas %></strong><span>Temas activos</span></div></div>
+  <div class="tarjeta estadistica"><span class="circulo naranja"><%- icono('MdQuiz') %></span><div><strong><%= conteos.tests %></strong><span>Tests publicados</span></div></div>
+  <div class="tarjeta estadistica"><span class="circulo morado"><%- icono('MdTrendingUp') %></span><div><strong><%= conteos.promedio === null ? '—' : conteos.promedio + ' %' %></strong><span>Promedio general</span></div></div>
+</div>
+<div class="dos-columnas">
+  <section class="tarjeta">
+    <h2>Promedio por tema</h2>
+    <% if (!porTema.length) { %><p class="vacio">Aparecerá cuando tus estudiantes terminen sus primeros tests.</p><% } %>
+    <% porTema.forEach(function (t) { %>
+      <div class="barra-fila"><span><%= t.nombre %></span><div class="barra" role="img" aria-label="<%= t.nombre %>: <%= t.promedio %>"><span style="width:<%= t.promedio %>%; background:<%= t.color %>"></span></div><strong><%= t.promedio %></strong></div>
+    <% }) %>
+  </section>
+  <section class="tarjeta">
+    <h2>Últimos intentos</h2>
+    <% if (!ultimos.length) { %><p class="vacio">Todavía no hay intentos.</p><% } %>
+    <ul class="lista-simple">
+      <% ultimos.forEach(function (r) { %>
+        <li><div><a href="/docente/rendimiento/intentos/<%= r.id %>"><strong><%= r.nombres %> <%= r.apellidos %></strong></a><small><%= r.test %></small></div><span class="nota <%= r.aprobado ? 'verde' : 'rojo' %>"><%= nota(r.calificacion) %></span></li>
+      <% }) %>
+    </ul>
+  </section>
+</div>
+<%- include('../partials/finApp') %>

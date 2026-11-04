@@ -1,0 +1,54 @@
+<%- include('../partials/inicioApp', { titulo: titulo }) %>
+<% var nuevo = modo === 'nuevo'; %>
+<div class="formulario-cuenta">
+  <a class="enlace-boton" href="/docente/temas" style="display:inline-flex; gap:4px; align-items:center; margin-bottom:12px"><%- icono('MdArrowBack') %> Volver a temas</a>
+  <section class="tarjeta">
+    <h2><%= nuevo ? 'Nuevo tema' : 'Editar tema' %></h2>
+    <%- include('../partials/mensajes') %>
+    <form id="form-tema" method="post" action="<%= nuevo ? '/docente/temas' : '/docente/temas/' + tema.id %>">
+      <div class="campo">
+        <label for="nombre">Nombre del tema</label>
+        <input id="nombre" name="nombre" value="<%= datos.nombre %>" maxlength="80" placeholder="Por ejemplo: Programación I" required>
+      </div>
+      <div class="campo">
+        <label for="descripcion">Descripción (opcional)</label>
+        <textarea id="descripcion" name="descripcion" maxlength="500" rows="3" placeholder="Qué contenidos abarca"><%= datos.descripcion %></textarea>
+        <div class="ayuda">Hasta 500 caracteres.</div>
+      </div>
+      <fieldset class="colores">
+        <legend class="grupo-titulo">Color del tema</legend>
+        <% var enLista = COLORES.some(function (c) { return c.valor === (datos.color || '').toUpperCase(); }); %>
+        <% COLORES.forEach(function (c, i) { var marcado = (datos.color || '').toUpperCase() === c.valor || (!enLista && i === 0); %>
+          <label class="muestra" title="<%= c.nombre %>">
+            <input type="radio" name="color" value="<%= c.valor %>" <%= marcado ? 'checked' : '' %>>
+            <span style="background:<%= c.valor %>"></span>
+            <span class="oculto-visual"><%= c.nombre %></span>
+          </label>
+        <% }) %>
+      </fieldset>
+      <div class="botones">
+        <a class="boton secundario" href="/docente/temas">Cancelar</a>
+        <button class="boton" type="submit"><%= nuevo ? 'Crear tema' : 'Guardar cambios' %></button>
+      </div>
+    </form>
+  </section>
+
+  <% if (!nuevo) { %>
+    <section class="tarjeta" style="margin-top:16px">
+      <h2>Estado del tema</h2>
+      <p style="color:var(--gris-texto); font-size:14px; margin:0 0 14px">
+        <%= tema.estado === 'activo' ? 'Si lo desactivas, tus estudiantes dejan de verlo, pero se conservan sus inscripciones, tests y notas.' : 'Este tema está inactivo: tus estudiantes no lo ven.' %>
+      </p>
+      <div class="botones" style="justify-content:flex-start">
+        <form method="post" action="/docente/temas/<%= tema.id %>/estado">
+          <button class="boton secundario" type="submit"><%= tema.estado === 'activo' ? 'Desactivar tema' : 'Activar tema' %></button>
+        </form>
+        <form method="post" action="/docente/temas/<%= tema.id %>/eliminar" data-confirmar="¿Eliminar el tema <%= tema.nombre %>? Se quitarán sus inscripciones.">
+          <button class="boton peligro" type="submit" <%= tests ? 'disabled' : '' %>>Eliminar tema</button>
+        </form>
+      </div>
+      <% if (tests) { %><p class="ayuda" style="font-size:13px; color:var(--gris-texto); margin:10px 0 0">No se puede eliminar porque tiene <%= tests %> <%= tests === 1 ? 'test' : 'tests' %>.</p><% } %>
+    </section>
+  <% } %>
+</div>
+<%- include('../partials/finApp') %>

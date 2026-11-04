@@ -1,0 +1,48 @@
+<%- include('../partials/inicioApp', { titulo: 'Test', seccion: seccion }) %>
+<div class="formulario-cuenta">
+  <a class="enlace-boton" href="/estudiante" style="display:inline-flex; gap:4px; align-items:center; margin-bottom:12px"><%- icono('MdArrowBack') %> Volver al inicio</a>
+  <section class="tarjeta">
+    <div class="tema-cabeza" style="margin-bottom:16px">
+      <span class="circulo" style="background:<%= test.tema_color %>"><%- icono('MdQuiz') %></span>
+      <div class="tema-titulo"><h2><%= test.nombre %></h2><p><%= test.tema %> · Docente: <%= test.docente %></p></div>
+    </div>
+    <% if (test.descripcion) { %><p class="instrucciones"><%= test.descripcion %></p><% } %>
+    <dl class="datos-test">
+      <div><dt>Preguntas</dt><dd><%= test.total_preguntas %></dd></div>
+      <div><dt>Tiempo</dt><dd><%= test.duracion_min %> min</dd></div>
+      <div><dt>Nota mínima</dt><dd><%= test.puntaje_aprobacion %></dd></div>
+      <div><dt>Intentos</dt><dd><%= intentos.length %> de <%= test.intentos_max %></dd></div>
+    </dl>
+    <% if (test.fecha_cierre) { %><p class="texto-gris">Cierra el <%= fecha(test.fecha_cierre, true) %>.</p><% } %>
+
+    <% if (enCurso) { %>
+      <div class="mensaje aviso"><%- icono('MdTimer') %><span>Tienes un intento en curso. El tiempo sigue corriendo.</span></div>
+      <a class="boton ancho" href="/estudiante/intentos/<%= enCurso.id %>/1">Continuar el test</a>
+    <% } else if (motivo) { %>
+      <div class="mensaje info"><%- icono('MdInfo') %><span><%= motivo %></span></div>
+    <% } else { %>
+      <ul class="consejos">
+        <li>Las preguntas salen en un orden distinto para cada estudiante.</li>
+        <li>Cada respuesta se guarda al momento. Si se te va el internet, vuelve a entrar y continúa.</li>
+        <li>El tiempo empieza a correr al pulsar Comenzar y no se detiene.</li>
+      </ul>
+      <form method="post" action="/estudiante/tests/<%= test.id %>/comenzar">
+        <button class="boton ancho" type="submit"><%= intentos.length ? 'Comenzar intento ' + (intentos.length + 1) : 'Comenzar' %></button>
+      </form>
+    <% } %>
+  </section>
+
+  <% var finalizados = intentos.filter(function (i) { return i.estado_intento === 'finalizado'; }); %>
+  <% if (finalizados.length) { %>
+    <section class="tarjeta" style="margin-top:16px">
+      <h2>Mis intentos</h2>
+      <ul class="lista-simple">
+        <% finalizados.forEach(function (i) { %>
+          <li><div><a href="/estudiante/resultados/<%= i.id %>"><strong>Intento <%= i.intento %></strong></a><small><%= i.correctas %> de <%= i.total_preguntas %> correctas · <%= duracionTexto(i.tiempo_segundos) %> · <%= fecha(i.fecha_fin, true) %></small></div>
+            <span class="nota <%= i.aprobado ? 'verde' : 'rojo' %>"><%= nota(i.calificacion) %></span></li>
+        <% }) %>
+      </ul>
+    </section>
+  <% } %>
+</div>
+<%- include('../partials/finApp') %>

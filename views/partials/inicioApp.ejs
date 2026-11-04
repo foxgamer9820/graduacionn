@@ -1,0 +1,30 @@
+<%- include('head', { titulo: titulo }) %>
+<body>
+<div class="app">
+  <aside class="menu" id="menu" aria-label="Menú principal">
+    <a class="menu-marca" href="/">
+      <span class="logo"><img src="/img/logo_ie.png" alt="Logo del Profesorado en Informática Educativa"></span>
+      <strong>Informática<br>Educativa</strong>
+    </a>
+    <nav>
+      <% MENUS[usuario.rol].forEach(function (op) {
+           var activo = rutaActual === op.ruta || (op.ruta !== '/docente' && op.ruta !== '/estudiante' && op.ruta !== '/tutor' && rutaActual.indexOf(op.ruta) === 0)
+             || (typeof seccion !== 'undefined' && seccion === op.ruta); %>
+        <a href="<%= op.ruta %>" class="<%= activo ? 'activo' : '' %>" <%= activo ? 'aria-current=page' : '' %>><%- icono(op.icono) %> <%= op.texto %></a>
+      <% }) %>
+    </nav>
+    <form method="post" action="/logout">
+      <button class="salir" type="submit"><%- icono('MdLogout') %> Cerrar sesión</button>
+    </form>
+  </aside>
+  <div class="principal">
+    <header class="encabezado">
+      <button class="boton-menu" type="button" aria-label="Abrir menú" aria-controls="menu" aria-expanded="false"><%- icono('MdMenu') %></button>
+      <h1><%= titulo %></h1>
+      <a class="usuario-chip" href="/perfil" title="Mi perfil">
+        <span class="avatar"><%= iniciales(usuario.nombres, usuario.apellidos) %></span>
+        <div><strong><%= primerNombre(usuario.nombres) %> <%= primerNombre(usuario.apellidos) %></strong><small><%= NOMBRE_ROL[usuario.rol] %></small></div>
+      </a>
+    </header>
+    <main class="contenido">
+      <%- include('flash') %>

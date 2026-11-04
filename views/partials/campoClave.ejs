@@ -1,0 +1,7 @@
+<div class="campo">
+  <label for="<%= id %>"><%= etiqueta %></label>
+  <div class="campo-clave">
+    <input type="password" id="<%= id %>" name="<%= id %>" autocomplete="<%= typeof auto !== 'undefined' ? auto : 'current-password' %>" required>
+    <button type="button" class="ver-clave" aria-label="Mostrar contraseña"><%- icono('MdVisibility') %></button>
+  </div>
+</div>

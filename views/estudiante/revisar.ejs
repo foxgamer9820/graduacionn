@@ -1,0 +1,34 @@
+<%- include('../partials/head', { titulo: titulo }) %>
+<body class="modo-test">
+<header class="test-encabezado">
+  <div class="test-nombre"><strong><%= intento.test %></strong><small><%= intento.tema %></small></div>
+  <div class="test-avance"><span>Revisión antes de entregar</span></div>
+  <div class="reloj" id="reloj" data-segundos="<%= intento.segundos_restantes %>" role="timer" aria-live="off">
+    <%- icono('MdTimer') %> <span id="reloj-texto"><%= Math.floor(intento.segundos_restantes / 60) %>:<%= String(intento.segundos_restantes % 60).padStart(2, '0') %></span>
+  </div>
+</header>
+<main class="test-cuerpo">
+  <section class="tarjeta pregunta-tarjeta">
+    <h2 style="font-size:20px">¿Listo para entregar?</h2>
+    <% if (sinResponder) { %>
+      <div class="mensaje aviso" style="margin-top:12px"><%- icono('MdWarning') %><span>Te <%= sinResponder === 1 ? 'falta 1 pregunta' : 'faltan ' + sinResponder + ' preguntas' %> por responder. Las preguntas sin respuesta cuentan como incorrectas.</span></div>
+    <% } else { %>
+      <div class="mensaje exito" style="margin-top:12px"><%- icono('MdCheckCircle') %><span>Respondiste todas las preguntas.</span></div>
+    <% } %>
+    <p class="texto-gris">Toca un número para volver a esa pregunta.</p>
+    <div class="puntos-navegacion grande">
+      <% mapa.forEach(function (m) { %>
+        <a href="/estudiante/intentos/<%= intento.id %>/<%= m.posicion %>" class="punto-nav <%= m.respondida ? 'respondida' : 'pendiente' %>" aria-label="Pregunta <%= m.posicion %><%= m.respondida ? ', respondida' : ', sin responder' %>"><%= m.posicion %></a>
+      <% }) %>
+    </div>
+    <form method="post" action="/estudiante/intentos/<%= intento.id %>/entregar" <%- sinResponder ? 'data-confirmar="Tienes preguntas sin responder. ¿Entregar de todos modos?"' : '' %>>
+      <button class="boton exito ancho" type="submit" style="margin-top:20px">Entregar test</button>
+    </form>
+  </section>
+  <form id="form-tiempo" method="post" action="/estudiante/intentos/<%= intento.id %>/entregar"></form>
+</main>
+<script src="/js/jquery.min.js"></script>
+<script src="/js/app.js?v=<%= v %>"></script>
+<script src="/js/test.js?v=<%= v %>"></script>
+</body>
+</html>
